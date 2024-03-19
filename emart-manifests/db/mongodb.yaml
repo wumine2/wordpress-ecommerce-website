@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emongo
+  namespace: emart
+  labels:
+    app: emongo
+spec:
+  selector:
+    matchLabels:
+      app: emongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: emongo
+    spec:
+      containers:
+      - name: emongo
+        image: mongo:4
+        ports:
+        - name: emongo-port
+          containerPort: 27017
+        volumeMounts:
+        - name: emongo-vol
+          mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: dbconfig
+              key: mongodbname
+        # - name: MONGO_INITDB_ROOT_USERNAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mongodb-creds
+        #       key: username
+        # - name: MONGO_INITDB_ROOT_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mongodb-creds
+        #       key: password
+        # - name: MONGO_URI
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: dbconfig
+        #       key: mongo_uri
+      volumes:
+      - name: emongo-vol
+        persistentVolumeClaim:
+          claimName: emongo-pvc

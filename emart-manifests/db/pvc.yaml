@@ -1,0 +1,28 @@
+# MySQL PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: emart
+spec:
+  storageClassName: hostpath # change appropriately
+  resources:
+    requests:
+      storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+
+---
+# MongoDB PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emongo-pvc
+  namespace: emart
+spec:
+  storageClassName: hostpath  # change appropriately
+  resources:
+    requests:
+      storage: 500Mi
+  accessModes:
+    - ReadWriteMany

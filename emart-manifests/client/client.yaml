@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  namespace: emart
+  labels:
+    app: client
+spec:
+  selector:
+    matchLabels:
+      app: client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      imagePullSecrets:
+      - name: dev-aws-ecr-us-east-1   # change 
+      containers:
+      - name: client
+        image: 532739883212.dkr.ecr.us-west-2.amazonaws.com/client:v1  #CHANGE
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4200
+          name: client-port
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
