@@ -6,11 +6,12 @@ pipeline {
     }
     environment  {
         SCANNER_HOME=tool 'sonar-scanner'
-        AWS_ACCOUNT_ID = credentials('aws-acct')
+        AWS_ACCOUNT_ID = credentials('AWS-ID')
         AWS_ECR_REPO_NAME = credentials('adservice')
         AWS_DEFAULT_REGION = 'us-west-2'
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
+
 
     stages {
         stage('Clean WorkSpace') {
@@ -18,14 +19,15 @@ pipeline {
                 cleanWs()
             }
         }
+
         
         stage('Checkout Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/mrolu-dev/mrolu'
+                git branch: 'main', url: 'https://github.com/wumine2/wordpress-ecommerce-website'
             }
-        }
+        }      
 
-         stage("Docker Image Build") {
+        stage("Docker Image Build") {
             steps {
                 script {
                     dir('Application-Code/adservice') {
@@ -41,7 +43,9 @@ pipeline {
                 sh 'trivy image ${AWS_ECR_REPO_NAME} > trivyimage-adservice-job-${BUILD_NUMBER}-${BUILD_ID}.txt'
             }
         }
-        stage("ECR Image Pushing") {
+
+
+        stage("Push Image to ECR") {
             steps {
                 script {
                         sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
@@ -54,15 +58,15 @@ pipeline {
 
         stage('Update Deployment file') {
             environment {
-                GIT_REPO_NAME = "mrolu"
-                GIT_USER_NAME = "mrolu-dev"
+                GIT_REPO_NAME = "wordpress-ecommerce-website"
+                GIT_USER_NAME = "wumine2"
             }
         steps {
             dir('micro-manifests/adservice') {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
-                        git config user.email "o.olumoyin@gmail.com"
-                        git config user.name "Olu Olumoyin"
+                        git config user.email "atiwunmi@yahoo.com"
+                        git config user.name "Wunmi"
                         BUILD_NUMBER=${BUILD_NUMBER}
                         echo $BUILD_NUMBER
                         imageTag=$(grep -oP '(?<=adservice:)[^ ]+' adservice.yaml)
@@ -86,7 +90,7 @@ pipeline {
                 body: "Project: ${env.JOB_NAME}<br/>" +
                     "Build Number: ${env.BUILD_NUMBER}<br/>" +
                     "URL: ${env.BUILD_URL}<br/>",
-                to: 'o.olumoyin@gmail.com',  
+                to: 'wunmijsm@gmail.com',  
                 attachmentsPattern: 'trivyfs-adservice-job-*.txt , trivyimage-adservice-job-*.txt'
         }
     }
