@@ -38,6 +38,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Sonarqube-Analysis') {
+            steps {
+                dir('Application-Code/adservice') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectName=adservice \
+                    -Dsonar.java.binaries=. \
+                    -Dsonar.projectKey=adservice '''
+                    }
+                }
+            }
+        }
+
         stage ("Trivy Scan Image"){
             steps {
                 sh 'trivy image ${AWS_ECR_REPO_NAME} > trivyimage-adservice-job-${BUILD_NUMBER}-${BUILD_ID}.txt'
