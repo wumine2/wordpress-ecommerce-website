@@ -12,13 +12,12 @@ terraform {
 
   backend "s3" {
 
-    bucket  = "laflortfstate"    //manually created 
-    key     = "jenkins/terraform.tfstate"
+    bucket  = "wordpress-project-01"   
+    key     = "ecr/terraform.tfstate"
     region  = "us-west-2"
     encrypt = true
 
-    # dynamodb_table = "Terraform_lock"   //manually created 
-
+ 
   }
 
 }
