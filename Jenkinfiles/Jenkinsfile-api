@@ -12,25 +12,60 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
 
-
     stages {
         stage('Clean WorkSpace') {
             steps {
                 cleanWs()
             }
         }
-
         
         stage('Checkout Git') {
             steps {
                 git branch: 'main', url: 'https://github.com/wumine2/wordpress-ecommerce-website'
             }
-        }      
-
-        stage("Docker Image Build") {
+        }
+        
+        stage('Sonarqube-Analysis') {
+            steps {
+                dir('Application-Code/api') {
+                withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=api \
+                        -Dsonar.projectKey=api '''
+                 }
+              }
+            }
+        }
+        
+        stage('Quality Check') {
             steps {
                 script {
-                    dir('Application-Code/Application-Code/api') {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+        
+       stage('OWASP Dependency-Check Scan') {
+            steps {
+                dir('Application-Code/api') {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'dp-check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+        
+        stage('Trivy File Scan') {
+            steps {
+                dir('Application-Code/api') {
+                    sh 'trivy fs . > ../../trivyfs-api-job-${BUILD_NUMBER}-${BUILD_ID}.txt'
+                }
+            }
+        }
+        
+         stage("Docker Image Build") {
+            steps {
+                script {
+                    dir('Application-Code/api') {
                             sh 'docker system prune -f'
                             sh 'docker container prune -f'
                             sh 'docker build -t ${AWS_ECR_REPO_NAME} .'
@@ -38,28 +73,12 @@ pipeline {
                 }
             }
         }
-
-        stage('Sonarqube-Analysis') {
-            steps {
-                dir('Application-Code/api') {
-                    withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                    -Dsonar.projectName=api \
-                    -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=api '''
-                    }
-                }
-            }
-        }
-
         stage ("Trivy Scan Image"){
             steps {
                 sh 'trivy image ${AWS_ECR_REPO_NAME} > trivyimage-api-job-${BUILD_NUMBER}-${BUILD_ID}.txt'
             }
         }
-
-
-        stage("Push Image to ECR") {
+        stage("ECR Image Pushing") {
             steps {
                 script {
                         sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
@@ -76,7 +95,7 @@ pipeline {
                 GIT_USER_NAME = "wumine2"
             }
         steps {
-            dir('micro-manifests/api') {
+            dir('emart-manifests/api') {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "atiwunmi@yahoo.com"

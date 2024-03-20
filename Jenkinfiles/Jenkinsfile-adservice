@@ -4,6 +4,7 @@ pipeline {
         jdk 'jdk'
         nodejs 'nodejs'
     }
+
     environment  {
         SCANNER_HOME=tool 'sonar-scanner'
         AWS_ACCOUNT_ID = credentials('AWS-ID')
@@ -12,20 +13,18 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
 
-
     stages {
         stage('Clean WorkSpace') {
             steps {
                 cleanWs()
             }
         }
-
         
         stage('Checkout Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/wumine2/wordpress-ecommerce-website'
+                git branch: 'main', url: 'https://github.com/wumine2/wordpress-ecommerce-website.git'
             }
-        }      
+        }
 
         stage("Docker Image Build") {
             steps {
@@ -38,16 +37,41 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Sonarqube-Analysis') {
             steps {
                 dir('Application-Code/adservice') {
-                    withSonarQubeEnv('sonar-server') {
+                withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                    -Dsonar.projectName=adservice \
-                    -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=adservice '''
-                    }
+                        -Dsonar.projectName=adservice \
+                        -Dsonar.sources=src \
+                        -Dsonar.projectKey=adservice '''
+                 }
+              }
+            }
+        }
+        
+        stage('Quality Check') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+        
+        stage('OWASP Dependency-Check Scan') {
+            steps {
+                dir('Application-Code/adservice') {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'dp-check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+        
+        stage('Trivy File Scan') {
+            steps {
+                dir('Application-Code/adservice') {
+                    sh 'trivy fs . > ../../trivyfs-adservice-job-${BUILD_NUMBER}-${BUILD_ID}.txt'
                 }
             }
         }
@@ -58,8 +82,7 @@ pipeline {
             }
         }
 
-
-        stage("Push Image to ECR") {
+        stage("ECR Image Pushing") {
             steps {
                 script {
                         sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
@@ -69,14 +92,13 @@ pipeline {
             }
         }
 
-
         stage('Update Deployment file') {
             environment {
                 GIT_REPO_NAME = "wordpress-ecommerce-website"
                 GIT_USER_NAME = "wumine2"
             }
         steps {
-            dir('micro-manifests/adservice') {
+            dir('emart-manifests/adservice') {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "atiwunmi@yahoo.com"
@@ -96,6 +118,7 @@ pipeline {
 
         }
     }
+
     post {
     always {
         script {
@@ -104,7 +127,7 @@ pipeline {
                 body: "Project: ${env.JOB_NAME}<br/>" +
                     "Build Number: ${env.BUILD_NUMBER}<br/>" +
                     "URL: ${env.BUILD_URL}<br/>",
-                to: 'wunmijsm@gmail.com',  
+                to: 'atiwunmi@yahoo.com',  
                 attachmentsPattern: 'trivyfs-adservice-job-*.txt , trivyimage-adservice-job-*.txt'
         }
     }
