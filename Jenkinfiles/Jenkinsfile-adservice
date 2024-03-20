@@ -44,6 +44,7 @@ pipeline {
                 withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
                         -Dsonar.projectName=adservice \
+                        -Dsonar.java.binaries=. \
                         -Dsonar.sources=src \
                         -Dsonar.projectKey=adservice '''
                  }
