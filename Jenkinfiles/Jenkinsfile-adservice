@@ -9,7 +9,7 @@ pipeline {
         SCANNER_HOME=tool 'sonar-scanner'
         AWS_ACCOUNT_ID = credentials('AWS-ID')
         AWS_ECR_REPO_NAME = credentials('adservice')
-        AWS_DEFAULT_REGION = 'us-west-2'
+        AWS_DEFAULT_REGION = 'us-east-1'
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
 
@@ -100,7 +100,7 @@ pipeline {
             }
         steps {
             dir('emart-manifests/adservice') {
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'git-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "atiwunmi@yahoo.com"
                         git config user.name "Wunmi"
@@ -128,7 +128,7 @@ pipeline {
                 body: "Project: ${env.JOB_NAME}<br/>" +
                     "Build Number: ${env.BUILD_NUMBER}<br/>" +
                     "URL: ${env.BUILD_URL}<br/>",
-                to: 'atiwunmi@yahoo.com',  
+                to: 'wunmijsm@gmail.com',  
                 attachmentsPattern: 'trivyfs-adservice-job-*.txt , trivyimage-adservice-job-*.txt'
         }
     }
