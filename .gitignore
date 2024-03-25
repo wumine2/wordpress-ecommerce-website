@@ -7,3 +7,4 @@
 
 # .tfvars files
 argo-pass.txt
+var.auto.tfvars 
