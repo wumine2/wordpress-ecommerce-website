@@ -23,7 +23,13 @@ sudo systemctl restart docker
 sudo chmod 777 /var/run/docker.sock
 
 # Run Docker Container of Sonarqube
+docker pull sonarqube:lts-community
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community --restart=always
+
+#Run Docker Container of Nexus
+docker pull sonatype/nexus3
+docker run -d --name nexus -p 8081:8081 sonatype/nexus3
+
 
 # Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
