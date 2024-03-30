@@ -99,8 +99,8 @@ pipeline {
                 GIT_USER_NAME = "wumine2"
             }
         steps {
-            dir('emart-manifests/adservice') {
-                withCredentials([string(credentialsId: 'git-token', variable: 'GITHUB_TOKEN')]) {
+            dir('micro-manifests/adservice') {
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "atiwunmi@yahoo.com"
                         git config user.name "Wunmi"

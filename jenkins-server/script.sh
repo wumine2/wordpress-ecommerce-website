@@ -24,7 +24,7 @@ sudo chmod 777 /var/run/docker.sock
 
 # Run Docker Container of Sonarqube
 docker pull sonarqube:lts-community
-docker run -d --name sonar -p 9000:9000 sonarqube:lts-community --restart=always
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community 
 
 #Run Docker Container of Nexus
 docker pull sonatype/nexus3
@@ -38,11 +38,8 @@ unzip awscliv2.zip
 sudo ./aws/install
 
 # Install Kubectl
-sudo apt install curl -y
-sudo curl -LO "https://dl.k8s.io/release/v1.28.4/bin/linux/amd64/kubectl"
-sudo chmod +x kubectl
-sudo mv kubectl /usr/local/bin/
-kubectl version --client
+
+
 
 # Install eksctl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
