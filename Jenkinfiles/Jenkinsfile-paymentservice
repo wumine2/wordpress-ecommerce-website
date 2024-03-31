@@ -30,7 +30,6 @@ pipeline {
                 dir('Application-Code/paymentservice') {
                 withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.sources=src \
                         -Dsonar.projectName=paymentservice \
                         -Dsonar.projectKey=paymentservice '''
                  }
