@@ -100,7 +100,7 @@ pipeline {
             dir('micro-manifests/cartservice') {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
-                        git config user.email "atiwunmi@yahoo.com
+                        git config user.email "atiwunmi@yahoo.com"
                         git config user.name "Wunmi"
                         BUILD_NUMBER=${BUILD_NUMBER}
                         echo $BUILD_NUMBER
