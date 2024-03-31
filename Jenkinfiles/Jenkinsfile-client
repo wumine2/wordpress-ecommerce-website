@@ -24,7 +24,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/wumine2/wordpress-ecommerce-website'
             }
         }
-
         
         stage('Sonarqube-Analysis') {
             steps {
@@ -101,7 +100,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "atiwunmi@yahoo.com"
-                        git config user.name "Wunmi"
+                        git config user.name "wunmi"
                         BUILD_NUMBER=${BUILD_NUMBER}
                         echo $BUILD_NUMBER
                         imageTag=$(grep -oP '(?<=client:)[^ ]+' client.yaml)
