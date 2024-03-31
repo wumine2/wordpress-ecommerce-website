@@ -19,7 +19,7 @@ spec:
       - name: dev-aws-ecr-us-east-1  #change
       containers:
         - name: api
-          image: 532739883212.dkr.ecr.us-west-2.amazonaws.com/api:v1  #change
+          image: 532739883212.dkr.ecr.us-west-2.amazonaws.com/api:1  #change
           imagePullPolicy: Always
           ports:
             - name: api-port
