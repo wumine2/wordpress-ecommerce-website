@@ -30,7 +30,6 @@ pipeline {
                 dir('Application-Code/emailservice') {
                 withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.sources=src \
                         -Dsonar.projectName=emailservice \
                         -Dsonar.projectKey=emailservice '''
                  }
