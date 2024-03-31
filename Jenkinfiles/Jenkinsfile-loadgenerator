@@ -31,7 +31,6 @@ pipeline {
                 withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
                         -Dsonar.projectName=loadgenerator \
-                        -Dsonar.sources=src \
                         -Dsonar.projectKey=loadgenerator '''
                  }
               }
