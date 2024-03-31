@@ -19,7 +19,7 @@ spec:
       - name: dev-aws-ecr-us-east-1  # change   
       containers:
         - name: webapi
-          image: 532739883212.dkr.ecr.us-west-2.amazonaws.com/webapi:v1 #change
+          image: 532739883212.dkr.ecr.us-west-2.amazonaws.com/webapi:1 #change
           imagePullPolicy: Always
           ports:
             - name: webapi-port
