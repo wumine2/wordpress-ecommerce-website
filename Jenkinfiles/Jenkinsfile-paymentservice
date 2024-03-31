@@ -92,7 +92,7 @@ pipeline {
         stage('Update Deployment file') {
             environment {
                 GIT_REPO_NAME = "wordpress-ecommerce-website"
-                GIT_USER_NAME = "Wunmi"
+                GIT_USER_NAME = "wumine2"
             }
         steps {
             dir('micro-manifests/paymentservice') {
