@@ -30,6 +30,7 @@ pipeline {
                 dir('Application-Code/cartservice') {
                 withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.sources=src \
                         -Dsonar.java.binaries=. \
                         -Dsonar.projectName=cartservice \
                         -Dsonar.projectKey=cartservice '''
