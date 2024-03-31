@@ -27,8 +27,8 @@ docker pull sonarqube:lts-community
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community 
 
 #Run Docker Container of Nexus
-docker pull sonatype/nexus3
-docker run -d --name nexus -p 8081:8081 sonatype/nexus3
+#docker pull sonatype/nexus3
+#docker run -d --name nexus -p 8081:8081 sonatype/nexus3
 
 
 # Install AWS CLI
